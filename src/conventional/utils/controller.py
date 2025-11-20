@@ -3,8 +3,8 @@ import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
 
-from odometry.stereo_vo import StereoVO
-from odometry.stereo_vio import StereoVIO
+from src.conventional.stereo_vo import StereoVO
+from src.conventional.stereo_vio import StereoVIO
 from image_publisher import ImagePublisher
 from rclpy.qos import QoSProfile
 from odometry.dl_stereo_vo import DLVO
