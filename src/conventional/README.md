@@ -13,4 +13,8 @@
 3. Run controller node like normal python programs (e.g. `python3 controller.py`)
 4. Enter command `ros2 topic pub /user_start std_msgs/msg/String "{data: 'start'}" --once` to start the experiment
 
-Note: You may need to update your PYTHONPATH environment variable
+## Data
+
+To run the experiment you need to download the euroc mav dataset from OpenVINS (the ros2bag) and make sure it has a `.db3` file-type and is located in the `src/conventional/data` directory.
+
+Note: You may need to update your PYTHONPATH environment variable and 

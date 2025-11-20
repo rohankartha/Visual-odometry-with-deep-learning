@@ -3,12 +3,10 @@ import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
 
-from src.conventional.stereo_vo import StereoVO
-from src.conventional.stereo_vio import StereoVIO
+from src.conventional.odometry.stereo_vo import StereoVO
+from src.conventional.odometry.stereo_vio import StereoVIO
 from image_publisher import ImagePublisher
 from rclpy.qos import QoSProfile
-from odometry.dl_stereo_vo import DLVO
-from odometry.dl_stereo_vio import DLVIO
 
 from std_msgs.msg import String
 import numpy as np
@@ -72,13 +70,6 @@ if __name__ == "__main__":
     #                             imu_config="data/kalibr_imu_chain.yaml",
     #                             initial_position=initial_position,
     #                             initial_quaternion=initial_quaternion)
-
-    # DL-VO
-    # vo_node = DLVO(config_path="data/camera_config.yaml", initial_position=initial_position, initial_quaternion=initial_quaternion)
-
-    # DL-VIO
-    # dl_vio_node = DLVIO(config_path="data/camera_config.yaml", imu_config="data/kalibr_imu_chain.yaml", initial_position=initial_position, initial_quaternion=initial_quaternion)
-
 
     # Image publisher node
     publisher = ImagePublisher(image_dir="data/V1_01_easy.db3",
