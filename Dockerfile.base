@@ -1,0 +1,64 @@
+# Dockerfile.base
+FROM --platform=linux/arm64 osrf/ros:humble-desktop
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# --- 1. Install System Dependencies ---
+RUN apt-get update && apt-get install -y \
+    curl iputils-ping net-tools wget screen git nano vim htop \
+    ros-${ROS_DISTRO}-ros-gz \
+    ros-${ROS_DISTRO}-tf-transformations \
+    ros-${ROS_DISTRO}-tf2-py \
+    ros-${ROS_DISTRO}-turtlebot3-simulations \
+    ros-${ROS_DISTRO}-cv-bridge \
+    ros-${ROS_DISTRO}-image-transport \
+    python3-pip python3-opencv python3-vcstool cmake build-essential \
+    libeigen3-dev libyaml-cpp-dev libgoogle-glog-dev libgflags-dev libsuitesparse-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install gtsam numpy torch torchvision matplotlib
+
+# --- 2. Set Up Workspace ---
+ENV ROS_WS=/root/colcon_ws
+RUN mkdir -p ${ROS_WS}/src
+WORKDIR ${ROS_WS}
+
+# --- 3. Build DBoW2 ---
+RUN git clone --depth 1 https://github.com/shinsumicco/DBoW2.git && \
+    cd DBoW2 && \
+    cmake -B build -DCMAKE_BUILD_TYPE=Release && \
+    cmake --build build -j$(nproc) && \
+    cmake --install build && \
+    cd .. && rm -rf DBoW2
+
+# --- 4. Build g2o ---
+RUN git clone --depth 1 https://github.com/RainerKuemmerle/g2o.git && \
+    cd g2o && \
+    cmake -B build -DCMAKE_BUILD_TYPE=Release && \
+    cmake --build build -j$(nproc) && \
+    cmake --install build && \
+    cd .. && rm -rf g2o
+
+# --- 5. Build Stella VSLAM Core ---
+WORKDIR ${ROS_WS}/src
+RUN git clone --depth 1 --recursive https://github.com/stella-cv/stella_vslam.git && \
+    cd stella_vslam && \
+    cmake -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DUSE_PANGOLIN_VIEWER=OFF \
+        -DUSE_SOCKET_PUBLISHER=OFF \
+        -DBUILD_WITH_MARCH_NATIVE=OFF && \
+    cmake --build build -j$(nproc) && \
+    cmake --install build
+
+WORKDIR ${ROS_WS}
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
+    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+# --- 6. Configure Environment ---
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /root/.bashrc && \
+    echo "source ${ROS_WS}/install/setup.bash" >> /root/.bashrc && \
+    echo "defshell -bash" >> ~/.screenrc
+
+WORKDIR ${ROS_WS}/src
+CMD ["/bin/bash"]

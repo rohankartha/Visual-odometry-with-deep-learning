@@ -1,0 +1,23 @@
+# Dockerfile.dev
+FROM --platform=linux/arm64 ros2-base:latest
+
+ENV ROS_WS=/root/colcon_ws
+WORKDIR ${ROS_WS}
+
+# --- Install SuperPoint and SuperGlue ---
+WORKDIR /opt
+RUN git clone --depth 1 https://github.com/magicleap/SuperGluePretrainedNetwork.git
+
+ENV PYTHONPATH="${PYTHONPATH}:/opt/SuperGluePretrainedNetwork"
+
+WORKDIR ${ROS_WS}
+
+# --- Clone Stella ROS 2 Wrapper ---
+RUN git clone --depth 1 --recursive https://github.com/stella-cv/stella_vslam_ros.git src/stella_vslam_ros
+
+# --- Build workspace (only wrapper / custom packages) ---
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
+    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+WORKDIR ${ROS_WS}/src
+CMD ["/bin/bash"]
