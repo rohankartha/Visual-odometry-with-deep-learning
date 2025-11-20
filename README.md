@@ -4,6 +4,7 @@
 
 ## Modules
 `src/odometry`: ROS nodes implementing conventional stereo visual odometry, deep-learning enhanced odometry, and visual-inertial odometry
+
 `src/utils`: ROS node to publish images and camera calibration information from bag files and an orchestration node
 
 ## How to run
