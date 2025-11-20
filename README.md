@@ -1,22 +1,15 @@
-`launch`: scripts to launch gazebo with specified world and robot
-`custom_models`: contains custom gazebo environments and robot models
+# Visual Odometry with Deep Learning
 
 
 
+## Modules
+`src/odometry`: ROS nodes implementing conventional stereo visual odometry, deep-learning enhanced odometry, and visual-inertial odometry
+`src/utils`: ROS node to publish images and camera calibration information from bag files and an orchestration node
 
-setup empty room with custom robot:
+## How to run
+1. Build Docker container with `docker-compose.yml`, `Dockerfile.base`, `Dockerfile.dev`
+2. Open two terminals in the container
+3. Run controller node like normal python programs (e.g. `python3 controller.py`)
+4. Enter command `ros2 topic pub /user_start std_msgs/msg/String "{data: 'start'}" --once` to start the experiment
 
-export GAZEBO_MODEL_PATH=~/catkin_ws/src/custom_models/models
-ros2 launch src/custom_models/empty_room.launch.py
-python3 src/experiments/vo_linear.py
-
-export PYTHONPATH=$PYTHONPATH:~/catkin_ws/src
-
-
-ros2 topic pub /user_start std_msgs/msg/String "{data: 'start'}" --once
-
-# Echo cam0 image messages
-ros2 topic echo /cam0/image_raw
-
-# Echo cam1 image messages
-ros2 topic echo /cam1/image_raw
+Note: You may need to update your PYTHONPATH environment variable
